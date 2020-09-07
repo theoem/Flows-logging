@@ -1,0 +1,54 @@
+Author:
+	Teodoras Celencevicius
+
+Required Libraries
+==================
+libprotoident 2.0.13 or later
+	* available from https://research.wand.net.nz/software/libprotoident.php
+
+libflowmanager 3.0.0 or later
+	* available from http://research.wand.net.nz/software/libflowmanager.php
+
+libpqxx 7.x
+    * available from https://pqxx.org/development/libpqxx/
+
+libpq 12 or later
+
+libpthread
+
+Installation
+============
+After having installed the required libraries, running the following series
+of commands should install this tool.
+
+    cmake .
+    make
+
+Tool
+=====
+The tool consists of 2 parts: flows1 and flows2.
+
+    Description:
+        The flows1 part of the tool attempts to identify each individual flow within the provided trace.
+        The flows2 part of the tool attempts to identify each individual flow within the provided log of ulogd2.
+      Identification occurs when the flow has concluded or expired.
+
+    Usage:
+        ./Flows [-u <inputURI>] [-r] [-l <inputLOG>] [-c <connInfo>]
+
+    Options:
+        -u  <inputURI>  URI to trace that is supported by libtrace for analysing flows1
+        -r  Don't ignore flows involving private RFC 1918 address space for flows1 (Ignored by default)
+        -l  <inputLOG>  URI to LOG file for analysing flows2
+        -c  <connInfo>  SQL connection info string. Example: "host=localhost dbname=mydb user=postgres password=12345"
+
+    Output:
+        For each flow in the input trace and LOG file information describing the flow is printed to TimescaleDB
+        database every 2 minutes into tables "flows1" and "flows2".
+
+        flows1 output format:
+            time(INTEGER, NOT NULL), src_ip(TEXT), src_port(TEXT), dst_ip(TEXT),
+            dst_port(TEXT), protocl(TEXT), duration(DOUBLE PRECISION)
+
+        flows2 output format:
+            time(INTEGER, NOT NULL), src_ip(TEXT), dst_port(TEXT), count(COUNT)
